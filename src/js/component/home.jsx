@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles/index.css";
 import {
 	Button,
 	Container,
@@ -11,14 +12,8 @@ import {
 	Table,
 } from "reactstrap";
 
-const dataTarea = [
-	/* 
-	{ id: 1, tarea: "Lavar mascota", fecha: "12 / 12 / 2021" },
-	{ id: 2, tarea: "Sacar a pasear mascota", fecha: "13 / 12 / 2021" },
-	{ id: 3, tarea: "Dar de comer a mascota", fecha: "14 / 12 / 2021" },
- */
-];
-
+const dataTarea = [{ id: 1, tarea: "Lavar mascota", fecha: "12 / 12 / 2021" }];
+console.log(dataTarea);
 //create your first component
 const Home = () => {
 	const [data, setData] = useState(dataTarea);
@@ -41,8 +36,13 @@ const Home = () => {
 		console.log(tareaSeleccionada);
 	};
 	const eliminar = () => {
-		setData(data.filter((tarea) => tarea.id !== tareaSeleccionada));
+		const filtrado = data.filter(
+			(tarea) => tarea.id !== tareaSeleccionada.id
+		);
+		setData(filtrado);
 		setModalEliminar(false);
+
+		console.log(filtrado);
 	};
 
 	const limpiarSetTareaSeleccionada = () => {
@@ -52,23 +52,24 @@ const Home = () => {
 	const insertar = () => {
 		const valorIsertar = tareaSeleccionada;
 		valorIsertar.id = data[data.length - 1].id + 1;
-		const dataNueva = data;
-		dataNueva.push(valorIsertar);
-		setData(dataNueva);
+		/* const dataNueva = data;
+		dataNueva.push(valorIsertar); */
+		setData([...data, valorIsertar]);
+		console.log(data);
 	};
 	return (
 		<>
-			<Container>
+			<Container className="p-4 col-8">
 				<Row>
 					<h1 className="d-flex justify-content-center">TODO List</h1>
 				</Row>
 				<Row>
-					<Form>
+					<Form className="border border-warning">
 						<div className="mb-3">
 							<label className="form-label">ID</label>
 							<input
 								className="form-control"
-								id=""
+								id="id"
 								name=""
 								value={data.length + 1}
 								onChange={handleChange}
@@ -79,8 +80,9 @@ const Home = () => {
 							<label className="form-label">Tarea</label>
 							<input
 								className="form-control"
-								id=""
+								id="tarea"
 								name="tarea"
+								placeholder="¿Qué tarea debe realizar?"
 								onChange={handleChange}
 							/>
 						</div>
@@ -89,21 +91,24 @@ const Home = () => {
 							<input
 								className="form-control"
 								name="fecha"
-								id=""
+								id="fecha"
+								placeholder="XX/XX/XXXX"
 								onChange={handleChange}
 							/>
 						</div>
-						<Button
-							className="btn btn-success"
-							onClick={() => insertar()}>
-							Insertar Tarea
-						</Button>
+						<div className="d-flex justify-content-center m-2">
+							<Button
+								className="btn btn-success d-flex justify-content-center"
+								onClick={() => insertar()}>
+								Insertar Tarea
+							</Button>
+						</div>
 					</Form>
 				</Row>
 			</Container>
-			<Container>
+			<Container className="col-8">
 				<Row>
-					<Table className="">
+					<Table className="table-warning mt-3">
 						<thead>
 							<tr>
 								<th>ID</th>
@@ -113,53 +118,69 @@ const Home = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{data.map((elemento) => {
-								return (
-									<tr key={elemento.id}>
-										<td>{elemento.id}</td>
-										<td>{elemento.tarea}</td>
-										<td>{elemento.fecha}</td>
-										<td>
-											<Button className="btn btn-primary">
+							{data.length === 0
+								? "Cree una tarea con el boton verde por favor..."
+								: data.map((elemento) => {
+										return (
+											<tr
+												className="table-light"
+												key={elemento.id}>
+												<td>{elemento.id}</td>
+												<td>{elemento.tarea}</td>
+												<td>{elemento.fecha}</td>
+												<td>
+													{/* <Button className="btn btn-primary">
 												Editar
 											</Button>
-											{"  "}
-											<Button
-												className="btn btn-danger"
-												onClick={() =>
-													seleccionarTarea(
-														elemento,
-														"Eliminar"
-													)
-												}>
-												Eliminar
-											</Button>
-										</td>
-									</tr>
-								);
-							})}
+											{"  "} */}
+													<Button
+														className="btn btn-danger"
+														onClick={() =>
+															seleccionarTarea(
+																elemento,
+																"Eliminar"
+															)
+														}>
+														Eliminar
+													</Button>
+													<Modal
+														isOpen={modalEliminar}>
+														<ModalBody>
+															Estás Seguro que
+															deseas eliminar
+															Tarea:{" "}
+															{tareaSeleccionada &&
+																tareaSeleccionada.tarea}
+														</ModalBody>
+														<ModalFooter>
+															<button
+																className="btn btn-danger"
+																onClick={() =>
+																	eliminar(
+																		elemento.id
+																	)
+																}>
+																Sí
+															</button>
+															<button
+																className="btn btn-secondary"
+																onClick={() =>
+																	setModalEliminar(
+																		false
+																	)
+																}>
+																No
+															</button>
+														</ModalFooter>
+													</Modal>
+												</td>
+											</tr>
+										);
+								  })}
 						</tbody>
 					</Table>
 				</Row>
 			</Container>
-			<Modal isOpen={modalEliminar}>
-				<ModalBody>
-					Estás Seguro que deseas eliminar Tarea:{" "}
-					{tareaSeleccionada && tareaSeleccionada.tarea}
-				</ModalBody>
-				<ModalFooter>
-					<button
-						className="btn btn-danger"
-						onClick={() => eliminar()}>
-						Sí
-					</button>
-					<button
-						className="btn btn-secondary"
-						onClick={() => setModalEliminar(false)}>
-						No
-					</button>
-				</ModalFooter>
-			</Modal>
 		</>
 	);
 };
